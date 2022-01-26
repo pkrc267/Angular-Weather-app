@@ -70,7 +70,7 @@ weatherApp.controller('forecastController', ['$scope', '$resource', '$log', 'cit
     var forecastDays = 7;
     $scope.city = cityService.city;
 
-    $scope.weatherAPI = $resource('http://api.openweathermap.org/data/2.5/forecast/daily?APPID=***REMOVED***', {get: {method: "JSONP"}});
+    $scope.weatherAPI = $resource('http://api.openweathermap.org/data/2.5/forecast/daily?APPID=', {get: {method: "JSONP"}});
 
     // this api accepts city name in 'q' and number of forecast days requested in 'cnt'
     $scope.weatherResult = $scope.weatherAPI.get({
