@@ -6,7 +6,7 @@ var weatherApp = angular.module('weatherApp', ['ngRoute', 'ngResource']);
 
 /**
  * Routing configs for the app
- * @function _ anonymouse function with route definitions
+ * @function _ anonymous function with route definitions
  */
 weatherApp.config( function ($routeProvider) {
 
@@ -16,6 +16,10 @@ weatherApp.config( function ($routeProvider) {
         controller: 'homeController'
     })
     .when('/forecast',{
+        templateUrl: 'pages/forecast.htm',
+        controller: 'forecastController'
+    })
+    .when('/forecast/:days',{
         templateUrl: 'pages/forecast.htm',
         controller: 'forecastController'
     });
@@ -28,7 +32,7 @@ weatherApp.config( function ($routeProvider) {
 weatherApp.config(['$sceDelegateProvider', function($sceDelegateProvider) {
     $sceDelegateProvider.resourceUrlWhitelist([
         'self',
-        'http://api.openweathermap.org/**'
+        'https://api.openweathermap.org/**'
     ]);
 }]);
 
@@ -64,26 +68,31 @@ weatherApp.controller('homeController', ['$scope', 'cityService', function($scop
  * @param $scope {service} local scope model for forecastController
  * @param $resource {service} for calling api and fetching data
  * @param $log {service} logging service
+ * @param $filter {service} filter service for manipulating various data types (here for date type manipulation)
+ * @param $routeParams {service} used to collect url params
  * @param cityService {service} our named service that gives access to city data
  */
-weatherApp.controller('forecastController', ['$scope', '$resource', '$log', 'cityService', function($scope, $resource, $log, cityService){
-    var forecastDays = 7;
+weatherApp.controller('forecastController', ['$scope', '$resource', '$log', '$filter', '$routeParams', 'cityService', function($scope, $resource, $log, $filter, $routeParams, cityService){
+
+    var requestedUrl = 'https://api.openweathermap.org/data/2.5/forecast?';
+
     $scope.city = cityService.city;
 
-    $scope.weatherAPI = $resource('http://api.openweathermap.org/data/2.5/forecast/daily?APPID=', {get: {method: "JSONP"}});
+    $scope.days = $routeParams.days || 8;
 
-    // this api accepts city name in 'q' and number of forecast days requested in 'cnt'
+    $scope.weatherAPI = $resource(requestedUrl, {get: {method: "JSONP"}});
+
+    // this api accepts api key, city name, number of entries to respond with, units (metric, imperial, standard)
     $scope.weatherResult = $scope.weatherAPI.get({
+        appid : appConfig.key,
         q : $scope.city,
-        cnt: forecastDays
+        cnt: $scope.days,
+        units: 'metric',
     });
 
-    $log.info($scope.weatherResult);
+    // format date time
+    $scope.convertToDate = function(dt) {
+        return $filter('date')( new Date(dt * 1000), 'hh a, MMM dd, yyyy');
+    };
 
-    /**
-     * TODO:
-     * - wait for API activation. We will see result logged in the console.
-     * - parse json
-     * - render on forecast page
-     */
 }]);
