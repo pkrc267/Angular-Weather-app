@@ -28,23 +28,13 @@
  * @param $routeParams {service} used to collect url params
  * @param cityService {service} our named service that gives access to city data
  */
-weatherApp.controller('forecastController', ['$scope', '$resource', '$log', '$filter', '$routeParams', 'cityService', function($scope, $resource, $log, $filter, $routeParams, cityService){
-
-    var requestedUrl = 'https://api.openweathermap.org/data/2.5/forecast?';
+weatherApp.controller('forecastController', ['$scope', '$log', '$filter', '$routeParams', 'cityService', 'weatherService', function($scope, $log, $filter, $routeParams, cityService, weatherService){
 
     $scope.city = cityService.city;
 
     $scope.days = $routeParams.days || '8';
 
-    $scope.weatherAPI = $resource(requestedUrl, {get: {method: "JSONP"}});
-
-    // this api accepts api key, city name, number of entries to respond with, units (metric, imperial, standard)
-    $scope.weatherResult = $scope.weatherAPI.get({
-        appid : appConfig.key,
-        q : $scope.city,
-        cnt: $scope.days,
-        units: 'metric',
-    });
+    $scope.weatherResult = weatherService.getWeather($scope.city, $scope.days);
 
     // format date time
     $scope.convertToDate = function(dt) {

@@ -3,6 +3,6 @@
         <h3 class="panel-title">{{ convertToDate( {dt: weatherDay.dt } ) | date: dateFormat }}</h3>
     </div>
     <div class="panel-body">
-        Temperature: {{ convertToStandard( { daytimeTemp: weatherDay.main.temp } ) }}
+        Temperature: {{ convertToStandard( { daytimeTemp: weatherDay.main.temp } ) }} °C
     </div>
 </div>
